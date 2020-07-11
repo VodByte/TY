@@ -59,4 +59,5 @@ private:
 
 	float DropSpeed = 0.f;
 	FVector BulletVelocity = FVector::ZeroVector;
+	bool VelocityInitFlag = false;
 };

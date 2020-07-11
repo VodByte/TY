@@ -13,16 +13,23 @@ AObjectPool::AObjectPool()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+void AObjectPool::PostInitializeComponents()
+{
+	AActor::PostInitializeComponents();
+
+	Pools.Add(PoolName, this);
+}
+
 TMap<FString, AObjectPool*> AObjectPool::GetPoolsMap()
 {
 	return Pools;
 }
 
+
 void AObjectPool::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Pools.Add(PoolName, this);
 	InitPool();
 }
 
@@ -46,25 +53,26 @@ AActor* AObjectPool::RequestPoolObject(const FTransform& InTransfrom, AActor* In
 	}
 	else
 	{
+		UE_LOG(LogTemp, Error, TEXT("Obj be requested but dequeue failed"));
 		return nullptr;
 	}
 }
 
-void AObjectPool::ReturnPoolObject(AActor* InActor)
+void AObjectPool::ReturnPoolObject(UInPoolObjectComponent* InComp)
 {
-	if (!InActor)
+	if (Pool.Enqueue(InComp->GetOwner()))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Nullptr be returned in pool"));
-		return;
+		++PoolRemain;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Returned in pool"));
+		UE_LOG(LogTemp, Error, TEXT("Obj enqueue failed"));
 	}
+}
 
-	auto Helper = GetPoolHelperComp(InActor);
-	Pool.Enqueue(InActor);
-	++PoolRemain;
+int AObjectPool::GetPoolSize()
+{
+	return PoolSize;
 }
 
 void AObjectPool::InitPool()
@@ -76,8 +84,8 @@ void AObjectPool::InitPool()
 		AActor* PoolableActor = World->SpawnActor<AActor>(ObjectType
 			, FVector::ZeroVector, FRotator::ZeroRotator);
 		auto PoolHelper = GetPoolHelperComp(PoolableActor);
-		PoolHelper->SetOwnershipPool(PoolName);
-		PoolHelper->DeactivePoolObject();
+		PoolHelper->SetOwnershipPool(this);
+		PoolHelper->SetPoolObjectActive(false);
 		Pool.Enqueue(PoolableActor);
 	}
 

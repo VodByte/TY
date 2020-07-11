@@ -4,12 +4,6 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "ObjectPool.h"
 
-UInPoolObjectComponent::UInPoolObjectComponent()
-{
-	PrimaryComponentTick.bCanEverTick = false;
-
-}
-
 void UInPoolObjectComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -21,11 +15,15 @@ void UInPoolObjectComponent::BeginPlay()
 	if (TriedActorComp) ParticleSysComp = Cast<UParticleSystemComponent>(TriedActorComp);
 }
 
-void UInPoolObjectComponent::SetPoolObjectLifeSpan(float LifeSpan_)
+UInPoolObjectComponent::UInPoolObjectComponent()
 {
-	PoolObjectLifeSpan = LifeSpan_;
+	PrimaryComponentTick.bCanEverTick = false;
+}
+
+void UInPoolObjectComponent::ActivePoolObjectLifeTimer()
+{
 	Owner->GetWorldTimerManager().SetTimer(PoolObjectLifeSpanTimer, this
-		, &UInPoolObjectComponent::DeactivePoolObject, PoolObjectLifeSpan, false);
+		, &UInPoolObjectComponent::ReturnToPool, PoolObjectLifeSpan, false);
 }
 
 void UInPoolObjectComponent::SetPoolObjectActive(bool InActive, AActor* InActorOwner)
@@ -36,14 +34,20 @@ void UInPoolObjectComponent::SetPoolObjectActive(bool InActive, AActor* InActorO
 	Owner->SetOwner(InActorOwner);
 	if (InActive)
 	{
-		SetPoolObjectLifeSpan(PoolObjectLifeSpan);
+		ActivePoolObjectLifeTimer();
 	}
 	else
 	{
 		Owner->GetWorldTimerManager().ClearTimer(PoolObjectLifeSpanTimer);
-		auto Pool = AObjectPool::GetPoolsMap().Find(OwnershipPoolName);
-		if (Pool) (*Pool)->ReturnPoolObject(Owner);
 	}
 
 	if (ParticleSysComp) ParticleSysComp->SetActive(InActive);
+}
+
+void UInPoolObjectComponent::ReturnToPool()
+{
+	SetPoolObjectActive(false);
+	check(OwnershipPool);
+	OwnershipPool->ReturnPoolObject(this);
+	
 }

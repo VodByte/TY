@@ -19,23 +19,25 @@ public:
 	UInPoolObjectComponent();
 	
 	void SetPoolObjectActive(bool InActive, AActor* InActorOwner = nullptr);
-	void SetPoolObjectLifeSpan(float LifeSpan_);
-	FORCEINLINE void SetOwnershipPool(FString InString){ OwnershipPoolName = InString;}
+	void ActivePoolObjectLifeTimer();
+	FORCEINLINE void SetOwnershipPool(AObjectPool* InPool) { OwnershipPool = InPool; }
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
+	AObjectPool* OwnershipPool;
 	AActor* Owner;
-	FString OwnershipPoolName = "Null";
 	float PoolObjectLifeSpan = 5.0f;
 	FTimerHandle PoolObjectLifeSpanTimer;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,meta=(AllowPrivateAccess=true))
 	bool PoolObjectActive = false;
+
 	// Maybe not exit
 	class UParticleSystemComponent* ParticleSysComp = nullptr;
 
-	FORCEINLINE void DeactivePoolObject() { SetPoolObjectActive(false); }
+	void ReturnToPool();
 	FORCEINLINE bool IsPoolObjectActive() const { return PoolObjectActive; }
 	FORCEINLINE void SetPoolObjectTransfrom(const FTransform& InTransfrom)
 	{

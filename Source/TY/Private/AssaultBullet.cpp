@@ -54,6 +54,8 @@ void AAssaultBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	BulletVelocity = GetActorForwardVector() * BulletSpeed * DeltaTime + FVector::DownVector * DropSpeed;
+	// Rot align to velocity
+	SetActorRotation(BulletVelocity.Rotation());
 	AddActorWorldOffset(BulletVelocity);
 }
 

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -31,13 +29,17 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
 	AActor* RequestPoolObject(const FTransform& InTransfrom, AActor* InOwner);
 
 	UFUNCTION(BlueprintCallable)
-	void ReturnPoolObject(AActor* InActor);
+	void ReturnPoolObject(UInPoolObjectComponent* InActor);
+
+	UFUNCTION(BlueprintCallable)
+	int GetPoolSize();
 
 private:
 	UPROPERTY(EditAnywhere, Category = ObjectPool)
@@ -50,7 +52,7 @@ private:
 	int PoolSize;
 
 	int PoolRemain = 0;
-	TQueue<AActor*> Pool;
+	TQueue<AActor*, EQueueMode::Mpsc> Pool;
 
 	void InitPool();
 	UInPoolObjectComponent* GetPoolHelperComp(AActor* InActor) const;
