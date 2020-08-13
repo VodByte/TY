@@ -4,64 +4,38 @@
 #include "GameFramework/Character.h"
 #include "TY_WingMan.generated.h"
 
-UCLASS()
+class UTY_HealthComponent;
+class UParticleSystem;
+
+/*
+	Basic flying character, only hold health component and
+	info for animation BP
+*/
+UCLASS(abstract, NotBlueprintable)
 class TY_API ATY_WingMan : public ACharacter
 {
 	GENERATED_BODY()
 
-private:
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* springArmComp = nullptr;
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* cameraComp = nullptr;
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* defaultCameraMark = nullptr;
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-		USceneComponent*strikeCameraMark = nullptr;
-
-	UPROPERTY(BlueprintGetter = GetIsStriking, VisibleAnywhere)
-		bool isStriking = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float maxEnergy = 1200.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float currentEnergy = 1200.f;
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float strikeMaxFlySpeed;
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float defaultMaxFlySpeed;
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float strikeMaxAcce;
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float defaultMaxAcce;
-
-
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		FVector strikeSpringArmRelativeLocation {
-		0.f, 130.f, 100.f
-	};
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		FVector defaultSpringArmRelativeLocation {};
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float strikeSpringArmMoveSpeed = 200.f;
-
 public:
-	// Sets default values for this character's properties
 	ATY_WingMan();
 
+	// Calc lean info for setting currentLeanAmount var
+	void UpdateLeanAmount(float InTurnDelta);
+
+	FTimerHandle StunTimer;
+	void BeginStun(float InStunTime);
+	void EndStun();
+
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTY_HealthComponent* HealthComponent;
 
-	void TriggerStrike();
-	void Strike(float deltaTime);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DefaultMaxFlySpeed = 2400.f;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentLeanAmount;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(BlueprintGetter)
-		FORCEINLINE bool GetIsStriking() const { return isStriking; }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxLeanAmount = 10.f;
 };
