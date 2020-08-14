@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "TY_EnemyBBTBase.h"
 #include "TY_BTT_FlyToLoc.generated.h"
 
 UCLASS()
-class TY_API UTY_BTT_FlyToLoc : public UBTTaskNode
+class TY_API UTY_BTT_FlyToLoc : public UTY_EnemyBBTBase
 {
 	GENERATED_BODY()
 
@@ -15,13 +15,9 @@ private:
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBlackboardKeySelector DestKey;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBlackboardKeySelector IsChasingKey;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float InputValue = 20.f;
 
 private:
 	float InitiDist = 0;
-	FVector PrevDest = FVector::ZeroVector;
+	FVector PrevInterestLoc = FVector::ZeroVector;
 };

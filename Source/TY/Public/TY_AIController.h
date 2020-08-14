@@ -78,5 +78,5 @@ private:
 	ATY_WingMan* OwnerPtr = nullptr;
 	static const FName CanSeeHostileKeyName;
 	static const FName CanOnlyHearHostileKeyName;
-	static const FName TargetLocKeyName;
+	static const FName InterestLocKeyName;
 };

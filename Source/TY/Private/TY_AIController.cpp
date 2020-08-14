@@ -9,7 +9,7 @@
 
 const FName ATY_AIController::CanSeeHostileKeyName = FName(TEXT("CanSeeHostile"));
 const FName ATY_AIController::CanOnlyHearHostileKeyName = FName(TEXT("CanOnlyHearHostile"));
-const FName ATY_AIController::TargetLocKeyName = FName(TEXT("TargetLocation"));
+const FName ATY_AIController::InterestLocKeyName = FName(TEXT("InterestLoc"));
 
 ATY_AIController::ATY_AIController()
 {
@@ -107,7 +107,7 @@ void ATY_AIController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
 	// Update atk target loc
 	if (bCanSeeHostile)
 	{
-		Blackboard->SetValueAsVector(TargetLocKeyName, PlayerPtr->GetActorLocation());
+		Blackboard->SetValueAsVector(InterestLocKeyName, PlayerPtr->GetActorLocation());
 	}
 
 }
@@ -123,7 +123,7 @@ void ATY_AIController::Fire()
 		check(ShootCompRef);
 	}
 
-	FVector TarLoc = Blackboard->GetValueAsVector(TargetLocKeyName);
+	FVector TarLoc = Blackboard->GetValueAsVector(InterestLocKeyName);
 	if (TarLoc.IsNearlyZero()) return;
 
 	ShootCompRef->PressTrigger(TarLoc);

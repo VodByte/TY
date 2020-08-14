@@ -1,13 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "TY_EnemyBBTBase.h"
 #include "TY_BTT_FireBullet.generated.h"
 
 class ATY_AIController;
 
 UCLASS()
-class TY_API UTY_BTT_FireBullet : public UBTTaskNode
+class TY_API UTY_BTT_FireBullet : public UTY_EnemyBBTBase
 {
 	GENERATED_BODY()
 

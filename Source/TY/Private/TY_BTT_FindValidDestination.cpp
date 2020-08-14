@@ -1,25 +1,19 @@
 #include "TY_BTT_FindValidDestination.h"
-#include "BehaviorTree/BTFunctionLibrary.h"
 #include "Engine/World.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AIController.h"
+#include "DrawDebugHelpers.h"
 
 EBTNodeResult::Type UTY_BTT_FindValidDestination::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	, uint8* NodeMemory)
 {
-	if (!OwnerPtr)
+	if (StartLoc.IsNearlyZero())
 	{
-		OwnerPtr = OwnerComp.GetOwner();
-		check(OwnerPtr);
+		StartLoc = OwnerPawn->GetActorLocation();
 	}
-
-	if (StartLoc == FVector::ZeroVector)
-	{
-		StartLoc = OwnerPtr->GetActorLocation();
-	}
-
-	bool bIsChasing = UBTFunctionLibrary::GetBlackboardValueAsBool(this, IsChasingKey);
 
 	// Get temp destination
-	auto GetNewDest = [this, &bIsChasing]()->FVector
+	auto GetNewDest = [this]()->FVector
 	{
 		FVector TempDir = FMath::VRand();
 		TempDir *= FVector(1.f, 1.f, 0.f);
@@ -33,19 +27,19 @@ EBTNodeResult::Type UTY_BTT_FindValidDestination::ExecuteTask(UBehaviorTreeCompo
 	{
 		FVector BoundOri;
 		FVector BoundExt;
-		OwnerPtr->GetActorBounds(true, BoundOri, BoundExt);
+		OwnerPawn->GetActorBounds(true, BoundOri, BoundExt);
 
 		FHitResult HitInfo;
 		static const FName CapsuleTraceSingleName(TEXT("CapsuleTraceSingle"));
-		FCollisionQueryParams Parmas(CapsuleTraceSingleName, false, OwnerPtr);
+		FCollisionQueryParams Parmas(CapsuleTraceSingleName, false, OwnerPawn);
 		const bool bHit = GetWorld()->SweepSingleByChannel(HitInfo, BoundOri, InVect
 			, FQuat::Identity, ECollisionChannel::ECC_Visibility
 			, FCollisionShape::MakeCapsule(BoundExt), Parmas);
-
+		DrawDebugCapsule(GetWorld(), BoundOri, BoundExt.X, BoundExt.Z, FQuat::Identity, FColor::Red, false);
 		return !bHit;
 	};
 
-	// Acturely calc and assign
+	// Acturely calc and assignSS
 	FVector Dest = FVector::ZeroVector;
 	for (int32 i = 0; i < CheckCount; i++)
 	{
@@ -53,10 +47,18 @@ EBTNodeResult::Type UTY_BTT_FindValidDestination::ExecuteTask(UBehaviorTreeCompo
 		if (CheckIfDestValid(Dest)) break;
 		else Dest = FVector::ZeroVector;
 	}
-	UBTFunctionLibrary::SetBlackboardValueAsVector(this, DestKey, Dest);
+	BBComp->SetValueAsVector(InterestLocKeyName, Dest);
 
-	if (Dest.IsNearlyZero()) return EBTNodeResult::Failed;
-	else return EBTNodeResult::Succeeded;
+	if (Dest.IsNearlyZero())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Node Failed, Find Valid Dest"));
+		return EBTNodeResult::Failed;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Node Succeeded, Find Valid Dest"));
+		return EBTNodeResult::Succeeded;
+	}
 }
 
 EBTNodeResult::Type UTY_BTT_FindValidDestination::AbortTask(UBehaviorTreeComponent& OwnerComp
