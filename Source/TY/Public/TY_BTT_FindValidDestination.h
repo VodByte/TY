@@ -9,9 +9,8 @@ class TY_API UTY_BTT_FindValidDestination : public UTY_EnemyBBTBase
 {
 	GENERATED_BODY()
 
-protected:
-	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp
-		, uint8* NodeMemory) override;
+public:
+	void FinishLatentTask(UBehaviorTreeComponent& OwnerComp, EBTNodeResult::Type TaskResult) const;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -20,6 +19,9 @@ protected:
 	float MaxRoamDist = 2000.f;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 CheckCount = 20;
+	
+	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp
+		, uint8* NodeMemory) override;
 
 private:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp

@@ -6,25 +6,27 @@
 
 class UBlackboardComponent;
 
-UCLASS()
+UCLASS(abstract, NotBlueprintable)
 class TY_API UTY_EnemyBBTBase : public UBTTaskNode
 {
 	GENERATED_BODY()
-	
+
+public:
+	//UTY_EnemyBBTBase(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	static UBlackboardComponent* BBComp;
 	static AAIController* OwnerCon;
 	static APawn* OwnerPawn;
 
 	static const FName IsChasingKeyName;
-	bool bIsChasing = false;
+	static bool bIsChasing;
 	static const FName InterestLocKeyName;
-	FVector InterestLoc = FVector::ZeroVector;
+	static FVector InterestLoc;
 	static const FName CanSeeHostileKeyName;
-	bool bCanSeeHostile = false;
+	static bool bCanSeeHostile;
 	static const FName CanOnlyHearHostileKeyName;
-	bool bCanOnlyHearHostile = false;
+	static bool bCanOnlyHearHostile;
 
-	virtual void TickTask(UBehaviorTreeComponent& OwnerComp
-		, uint8* NodeMemory, float DeltaSeconds) override;
+	void RefreshBBData(UBehaviorTreeComponent& OwnerComp);
 };

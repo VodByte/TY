@@ -7,6 +7,8 @@
 EBTNodeResult::Type UTY_BTT_FindValidDestination::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	, uint8* NodeMemory)
 {
+	RefreshBBData(OwnerComp);
+
 	if (StartLoc.IsNearlyZero())
 	{
 		StartLoc = OwnerPawn->GetActorLocation();
@@ -18,7 +20,7 @@ EBTNodeResult::Type UTY_BTT_FindValidDestination::ExecuteTask(UBehaviorTreeCompo
 		FVector TempDir = FMath::VRand();
 		TempDir *= FVector(1.f, 1.f, 0.f);
 		TempDir.Normalize();
-		return (bIsChasing ? FVector::ZeroVector : StartLoc) 
+		return (bIsChasing ? InterestLoc : StartLoc) 
 			+ TempDir * FMath::FRandRange(MinRoamDist, MaxRoamDist);
 	};
 
@@ -35,7 +37,8 @@ EBTNodeResult::Type UTY_BTT_FindValidDestination::ExecuteTask(UBehaviorTreeCompo
 		const bool bHit = GetWorld()->SweepSingleByChannel(HitInfo, BoundOri, InVect
 			, FQuat::Identity, ECollisionChannel::ECC_Visibility
 			, FCollisionShape::MakeCapsule(BoundExt), Parmas);
-		DrawDebugCapsule(GetWorld(), BoundOri, BoundExt.X, BoundExt.Z, FQuat::Identity, FColor::Red, false);
+		DrawDebugCapsule(GetWorld(), BoundOri, BoundExt.X, BoundExt.Z, FQuat::Identity, FColor::Red, false
+			, 0.1f, 0, 5.f);
 		return !bHit;
 	};
 
@@ -67,4 +70,10 @@ EBTNodeResult::Type UTY_BTT_FindValidDestination::AbortTask(UBehaviorTreeCompone
 	StartLoc = FVector::ZeroVector;
 	
 	return EBTNodeResult::Aborted;
+}
+
+
+void UTY_BTT_FindValidDestination::FinishLatentTask(UBehaviorTreeComponent& OwnerComp, EBTNodeResult::Type TaskResult) const
+{
+
 }

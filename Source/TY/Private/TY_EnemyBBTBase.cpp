@@ -1,3 +1,4 @@
+#include "..\Public\TY_EnemyBBTBase.h"
 #include "TY_EnemyBBTBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
@@ -10,8 +11,19 @@ const FName UTY_EnemyBBTBase::InterestLocKeyName = FName(TEXT("InterestLoc"));
 const FName UTY_EnemyBBTBase::CanSeeHostileKeyName = FName(TEXT("CanSeeHostile"));
 const FName UTY_EnemyBBTBase::CanOnlyHearHostileKeyName = FName(TEXT("CanOnlyHearHostile"));
 
-void UTY_EnemyBBTBase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+bool UTY_EnemyBBTBase::bIsChasing = false;
+FVector UTY_EnemyBBTBase::InterestLoc = FVector::ZeroVector;
+bool UTY_EnemyBBTBase::bCanSeeHostile = false;
+bool UTY_EnemyBBTBase::bCanOnlyHearHostile = false;
+
+//UTY_EnemyBBTBase::UTY_EnemyBBTBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+//{
+//}
+
+void UTY_EnemyBBTBase::RefreshBBData(UBehaviorTreeComponent& OwnerComp)
 {
+	UE_LOG(LogTemp, Error, TEXT("Refreshed"));
+
 	if (!OwnerCon)
 	{
 		OwnerCon = OwnerComp.GetAIOwner();

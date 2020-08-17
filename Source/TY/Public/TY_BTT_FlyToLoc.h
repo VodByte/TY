@@ -9,15 +9,18 @@ class TY_API UTY_BTT_FlyToLoc : public UTY_EnemyBBTBase
 {
 	GENERATED_BODY()
 
-private:
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
-			, uint8* NodeMemory);
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FBlackboardKeySelector IntersetLocKey;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float InputValue = 20.f;
 
 private:
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
+		, uint8* NodeMemory);
+
 	float InitiDist = 0;
 	FVector PrevInterestLoc = FVector::ZeroVector;
 };

@@ -7,8 +7,9 @@
 EBTNodeResult::Type UTY_BTT_FlyToLoc::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	, uint8* NodeMemory)
 {
-	FVector OwnerLoc = OwnerPawn->GetActorLocation();
+	RefreshBBData(OwnerComp);
 
+	FVector OwnerLoc = OwnerPawn->GetActorLocation();
 	if (InterestLoc != PrevInterestLoc)
 	{
 		PrevInterestLoc == InterestLoc;

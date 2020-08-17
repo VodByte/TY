@@ -27,7 +27,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBehaviorTree* BehaviorTree;
 
-	// Begin vars about Perception
+	// ~Begin vars about Perception
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float AISightRadius = 4000.f;
 	
@@ -53,13 +53,14 @@ protected:
 	UAISenseConfig_Hearing* HearingConfig;
 	// ~End vars about Perception
 
-	// Begin vars about formation
+	// ~Begin vars about formation
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AActor* PairPtr = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsWingMate = false;
+	// ~End
 
-	// Begin vars abhout atk
+	// ~Begin vars abhout atk
 	float AutoFireDuration = 3.0f;
 	// In Percent of origin value
 	float AutoFireDurationVarity = 0.f;

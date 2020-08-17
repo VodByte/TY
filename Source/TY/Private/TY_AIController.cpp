@@ -109,7 +109,6 @@ void ATY_AIController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
 	{
 		Blackboard->SetValueAsVector(InterestLocKeyName, PlayerPtr->GetActorLocation());
 	}
-
 }
 
 
