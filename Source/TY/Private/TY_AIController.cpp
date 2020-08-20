@@ -1,15 +1,10 @@
 #include "TY_AIController.h"
 #include "TY_ShootComponent.h"
 #include "TY_WingMan.h"
-#include "TimerManager.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "BehaviorTree/BlackboardComponent.h"
-
-const FName ATY_AIController::CanSeeHostileKeyName = FName(TEXT("CanSeeHostile"));
-const FName ATY_AIController::CanOnlyHearHostileKeyName = FName(TEXT("CanOnlyHearHostile"));
-const FName ATY_AIController::InterestLocKeyName = FName(TEXT("InterestLoc"));
 
 ATY_AIController::ATY_AIController()
 {
@@ -55,82 +50,28 @@ void ATY_AIController::BeginPlay()
 
 void ATY_AIController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
 {
-	// Find nearest hostile
-	TArray<AActor*> HostileActors;
-	for (auto& e : UpdatedActors)
-	{
-		if (e->Tags.Num() <= 0) continue;
-		if (e->Tags.Contains("RedTeam"))
-		{
-			HostileActors.Add(e);
-		}
-	}
-
-	auto PerComp = GetPerceptionComponent();
-	bool bCanSeeHostile = false;
-	bool bOnlyCanHearHostile = false;
-
-	if (HostileActors.Num() == 0) return;
-	// Sort hostile actor by distance to owner
-	HostileActors.Sort([this](const AActor& A, const AActor& B)
-		{
-			auto SourceLoc = OwnerPtr->GetActorLocation();
-			float DistA = FVector::DistSquared(SourceLoc, A.GetActorLocation());
-			float DistB = FVector::DistSquared(SourceLoc, B.GetActorLocation());
-			return DistA > DistB;
-		});
-
 	FActorPerceptionBlueprintInfo Info;
-	for (auto e : HostileActors)
+	for (auto e : UpdatedActors)
 	{
-		PerComp->GetActorsPerception(e, Info);
-		bCanSeeHostile = Info.LastSensedStimuli[0].WasSuccessfullySensed();
-		if (bCanSeeHostile)
+		GetPerceptionComponent()->GetActorsPerception(e, Info);
+		bool bCanSee = Info.LastSensedStimuli[0].WasSuccessfullySensed();
+		bool bCanHear = Info.LastSensedStimuli[1].WasSuccessfullySensed();
+		if (bCanSee)
 		{
-			break;
+			SeeActors.Add(e);
+		}
+		else
+		{
+			if (SeeActors.Contains(e)) SeeActors.Remove(e);
+		}
+		
+		if (bCanHear)
+		{
+			HearActors.Add(e);
+		}
+		else
+		{
+			if (HearActors.Contains(e)) HearActors.Remove(e);
 		}
 	}
-
-	// If cannot see any, check hearing
-	if (!bCanSeeHostile)
-	{
-		for (auto e : HostileActors)
-		{
-			PerComp->GetActorsPerception(e, Info);
-			bOnlyCanHearHostile = Info.LastSensedStimuli[1].WasSuccessfullySensed();
-		}
-	}
-	
-	Blackboard->SetValueAsBool(CanSeeHostileKeyName, bCanSeeHostile);
-	Blackboard->SetValueAsBool(CanOnlyHearHostileKeyName, bOnlyCanHearHostile);
-
-	// Update atk target loc
-	if (bCanSeeHostile)
-	{
-		Blackboard->SetValueAsVector(InterestLocKeyName, PlayerPtr->GetActorLocation());
-	}
-}
-
-
-void ATY_AIController::Fire()
-{
-	if (GetWorldTimerManager().IsTimerActive(AutoFireTimer)) return;
-
-	if (!ShootCompRef)
-	{
-		ShootCompRef = GetPawn()->FindComponentByClass<UTY_ShootComponent>();
-		check(ShootCompRef);
-	}
-
-	FVector TarLoc = Blackboard->GetValueAsVector(InterestLocKeyName);
-	if (TarLoc.IsNearlyZero()) return;
-
-	ShootCompRef->PressTrigger(TarLoc);
-	GetWorldTimerManager().SetTimer(AutoFireTimer, this, &ATY_AIController::Ceasefire
-		, AutoFireDuration + AutoFireDuration * FMath::FRandRange(-AutoFireDurationVarity, AutoFireDurationVarity));
-}
-
-void ATY_AIController::Ceasefire()
-{
-	ShootCompRef->ReleaseTrigger();
 }

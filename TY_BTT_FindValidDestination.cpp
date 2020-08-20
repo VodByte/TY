@@ -71,9 +71,3 @@ EBTNodeResult::Type UTY_BTT_FindValidDestination::AbortTask(UBehaviorTreeCompone
 	
 	return EBTNodeResult::Aborted;
 }
-
-
-void UTY_BTT_FindValidDestination::FinishLatentTask(UBehaviorTreeComponent& OwnerComp, EBTNodeResult::Type TaskResult) const
-{
-
-}

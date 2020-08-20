@@ -9,9 +9,6 @@ class TY_API UTY_BTT_FindValidDestination : public UTY_EnemyBBTBase
 {
 	GENERATED_BODY()
 
-public:
-	void FinishLatentTask(UBehaviorTreeComponent& OwnerComp, EBTNodeResult::Type TaskResult) const;
-
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float MinRoamDist = 500.f;

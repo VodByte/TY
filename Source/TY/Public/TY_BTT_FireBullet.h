@@ -4,7 +4,7 @@
 #include "TY_EnemyBBTBase.h"
 #include "TY_BTT_FireBullet.generated.h"
 
-class ATY_AIController;
+class UTY_ShootComponent;
 
 UCLASS()
 class TY_API UTY_BTT_FireBullet : public UTY_EnemyBBTBase
@@ -12,10 +12,24 @@ class TY_API UTY_BTT_FireBullet : public UTY_EnemyBBTBase
 	GENERATED_BODY()
 
 public:
+	UTY_BTT_FireBullet();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FBlackboardKeySelector FirePointKey;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AutoFireDuration = 3.0f;
+
+	// In Percent of origin value
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AutoFireDurationVarity = 0.f;
 
 private:
-	ATY_AIController* AICon;
+	FTimerHandle AutoFireTimer;
+	UTY_ShootComponent* ShootCompPtr;
 
+	void Ceasefire();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		, uint8* NodeMemory);
 };

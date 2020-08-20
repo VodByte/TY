@@ -71,7 +71,7 @@ FVector UTY_ShootComponent::CalcAimLoc(FVector TargetLoc, FVector TargetVel, flo
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("No Valid Root : %s ShootCompRef::CalcAimLoc")
+			UE_LOG(LogTemp, Error, TEXT("No Valid Root : %s ShootCompPtr::CalcAimLoc")
 				, *GetOwner()->GetName());
 			return FVector::ZeroVector;
 		}
