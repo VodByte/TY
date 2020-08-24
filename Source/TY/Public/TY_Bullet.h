@@ -31,5 +31,5 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void InitiBullet(const FTY_GunData& InGunData/*, FVector InInheritVel = FVector::ZeroVector*/) PURE_VIRTUAL(ATY_Bullet::InitBullet, );
+	virtual void InitiBullet(const FTY_GunData& InGunData, APawn* InBulletOwner) PURE_VIRTUAL(ATY_Bullet::InitBullet, );
 };

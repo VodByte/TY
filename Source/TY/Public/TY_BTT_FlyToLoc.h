@@ -13,11 +13,18 @@ public:
 	UTY_BTT_FlyToLoc();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FBlackboardKeySelector DestKey;
+	UPROPERTY(EditAnywhere, meta=(ClampMin = "0.0", UIMin="0.0"))
+	float AcceptableRadius = 5.f;
 
 private:
+	FVector DestLoc = FVector::ZeroVector;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		, uint8* NodeMemory);
+
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, 
+		uint8* NodeMemory, float DeltaSeconds) override;
+
+	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp
+		, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 };

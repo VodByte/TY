@@ -19,7 +19,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category=AssaultBullet)
-	virtual void InitiBullet(const FTY_GunData& InGunData/*, FVector InInheritVel = FVector::ZeroVector*/) override;
+	virtual void InitiBullet(const FTY_GunData& InGunData, APawn* InBulletOwner) override;
 
 protected:
 	UFUNCTION()
