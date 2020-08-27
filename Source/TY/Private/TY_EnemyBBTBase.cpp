@@ -4,10 +4,6 @@
 #include "AIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 
-UBlackboardComponent* UTY_EnemyBBTBase::BBComp = nullptr;
-AAIController* UTY_EnemyBBTBase::OwnerCon = nullptr;
-APawn* UTY_EnemyBBTBase::OwnerPawn= nullptr;
-
 void UTY_EnemyBBTBase::InitiBBData(UBehaviorTreeComponent& OwnerComp)
 {
 	if (!OwnerCon)

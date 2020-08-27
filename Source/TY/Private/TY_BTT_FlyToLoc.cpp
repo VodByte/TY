@@ -1,49 +1,45 @@
 #include "TY_BTT_FlyToLoc.h"
 #include "Engine/World.h"
-#include "AIController.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 
 UTY_BTT_FlyToLoc::UTY_BTT_FlyToLoc()
 {
 	NodeName = FString("FlyToLoc");
 	bNotifyTick = true;
+	BlackboardKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UTY_BTT_FlyToLoc, BlackboardKey));
+	BlackboardKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UTY_BTT_FlyToLoc, BlackboardKey), AActor::StaticClass());
 }
 
 EBTNodeResult::Type UTY_BTT_FlyToLoc::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	, uint8* NodeMemory)
 {
 	InitiBBData(OwnerComp);
-
-	FVector OwnerLoc = OwnerPawn->GetActorLocation();
-	UObject* TempTar = BBComp->GetValueAsObject(BlackboardKey.SelectedKeyName);
-	check(TempTar);
-	AActor* Target = Cast<AActor>(TempTar);
-	DestLoc = Target->GetActorLocation();
-
-	// Translation
-	if (!DestLoc.IsNearlyZero())
+	if (!BBComp->IsValidKey(BlackboardKey.GetSelectedKeyID()))
 	{
-		return EBTNodeResult::InProgress;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Wrong dest location"));
 		return EBTNodeResult::Failed;
 	}
+
+	DestLoc = FVector::ZeroVector;
+	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
+	{
+		UObject* TempTar = BBComp->GetValueAsObject(BlackboardKey.SelectedKeyName);
+		AActor* Target = Cast<AActor>(TempTar);
+		DestLoc = Target->GetActorLocation();
+	}
+	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
+	{
+		DestLoc = BBComp->GetValueAsVector(BlackboardKey.SelectedKeyName);
+ 	}
+	return EBTNodeResult::InProgress;
 }
 
 void UTY_BTT_FlyToLoc::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	FVector OwnerLoc = OwnerPawn->GetActorLocation();
-	FVector DirToDest = (DestLoc - OwnerLoc).GetSafeNormal();
-	OwnerPawn->AddMovementInput(DirToDest);
-
-	if (FVector::Dist(OwnerLoc, DestLoc) <= AcceptableRadius)
+	MoveDir = (DestLoc - OwnerPawn->GetActorLocation()).GetSafeNormal();
+	OwnerPawn->AddMovementInput(MoveDir);
+	if (FVector::Dist(OwnerPawn->GetActorLocation(), DestLoc) <= AcceptableRadius)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
-}
-
-void UTY_BTT_FlyToLoc::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
-{
-	DestLoc = FVector::ZeroVector;
 }

@@ -17,6 +17,7 @@ protected:
 	float AcceptableRadius = 5.f;
 
 private:
+	FVector MoveDir = FVector::ZeroVector;
 	FVector DestLoc = FVector::ZeroVector;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
@@ -24,7 +25,4 @@ private:
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, 
 		uint8* NodeMemory, float DeltaSeconds) override;
-
-	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp
-		, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 };

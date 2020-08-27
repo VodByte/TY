@@ -24,8 +24,8 @@ EBTNodeResult::Type UTY_BBT_FaceToLoc::ExecuteTask(UBehaviorTreeComponent& Owner
 	}
 	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 	{
-		if (Loc == FVector::ZeroVector) return EBTNodeResult::Failed;
 		Loc = BBComp->GetValueAsVector(BlackboardKey.SelectedKeyName);
+		if (Loc == FVector::ZeroVector) return EBTNodeResult::Failed;
 	}
 
 	FRotator NewRot = FRotationMatrix::MakeFromX(Loc - OwnerPawn->GetActorLocation()).Rotator();

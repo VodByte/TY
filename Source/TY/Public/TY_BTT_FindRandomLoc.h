@@ -22,6 +22,11 @@ public:
 	UTY_BTT_FindRandomLoc();
 
 private:
+	FVector BaseLoc = FVector::ZeroVector;
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
+		, uint8* NodeMemory) override;
+
+	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp
 		, uint8* NodeMemory) override;
 };

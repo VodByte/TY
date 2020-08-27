@@ -13,9 +13,9 @@ class TY_API UTY_EnemyBBTBase : public UBTTask_BlackboardBase
 	GENERATED_BODY()
 
 protected:
-	static UBlackboardComponent* BBComp;
-	static AAIController* OwnerCon;
-	static APawn* OwnerPawn;
+	UBlackboardComponent* BBComp = nullptr;
+	AAIController* OwnerCon = nullptr;
+	APawn* OwnerPawn = nullptr;
 
 	void InitiBBData(UBehaviorTreeComponent& OwnerComp);
 };

@@ -12,16 +12,19 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::ExecuteTask(UBehaviorTreeComponent& O
 	, uint8* NodeMemory)
 {
 	InitiBBData(OwnerComp);
+	if (BaseLoc.IsNearlyZero())
+	{
+		BaseLoc = OwnerPawn->GetActorLocation();
+	}
 
 	// Get temp destination
 	auto GetTempDest = [this]()->FVector
 	{
 		FVector TempDir = FMath::VRand();
-		TempDir *= FVector(1.f, 1.f, 0.f);
+		//TempDir *= FVector(1.f, 1.f, 0.f);
 		TempDir.Normalize();
 		check(OwnerPawn);
-		return OwnerPawn->GetActorLocation() + 
-			TempDir * FMath::FRandRange(MinDistance, MaxDistance);
+		return BaseLoc + TempDir * FMath::FRandRange(MinDistance, MaxDistance);
 	};
 
 	// Check validity
@@ -35,6 +38,7 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::ExecuteTask(UBehaviorTreeComponent& O
 		static const FName CapsuleTraceSingleName(TEXT("CapsuleTraceSingle"));
 		FCollisionQueryParams Parmas(CapsuleTraceSingleName, false);
 		Parmas.AddIgnoredActor(OwnerPawn);
+		TArray<AActor*> 
 		const bool bHit = GetWorld()->SweepSingleByChannel(HitInfo, BoundOri, InVect
 			, FQuat::Identity, ECollisionChannel::ECC_Visibility
 			, FCollisionShape::MakeCapsule(BoundExt), Parmas);
@@ -58,8 +62,13 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::ExecuteTask(UBehaviorTreeComponent& O
 	}
 	else
 	{
-		BBComp->SetValueAsVector(BlackboardKey.SelectedKeyName, FVector::ZeroVector);
-		UE_LOG(LogTemp, Error, TEXT("Can not calc valid patrolling location"));
+		BBComp->ClearValue(BlackboardKey.SelectedKeyName);
 		return EBTNodeResult::Failed;
 	}
+}
+
+EBTNodeResult::Type UTY_BTT_FindRandomLoc::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	BaseLoc = FVector::ZeroVector;
+	return EBTNodeResult::Aborted;
 }
