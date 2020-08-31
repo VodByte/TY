@@ -5,6 +5,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #define INITI_KEY(x) const FName ATY_AIController::x##KeyName = FName(TEXT(#x));
 
@@ -54,6 +55,7 @@ void ATY_AIController::BeginPlay()
 	OwnerPtr = GetPawn<ATY_WingMan>();
 	check(OwnerPtr);
 	OwnerPtr->OnTakeAnyDamage.AddDynamic(this, &ATY_AIController::HandleOnTakeAnyDamage);
+	DefaultFlySpeed = OwnerPtr->GetCharacterMovement()->MaxFlySpeed;
 }
 
 void ATY_AIController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
@@ -141,4 +143,9 @@ void ATY_AIController::Tick(float DeltaTime)
 			HatredMap.Remove(e);
 		}
 	}
+}
+
+void ATY_AIController::UpdateFlySpeed(float InPercent)
+{
+	OwnerPtr->GetCharacterMovement()->MaxFlySpeed = DefaultFlySpeed * InPercent;
 }

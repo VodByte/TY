@@ -1,5 +1,4 @@
 #include "TY_BTT_FindRandomLoc.h"
-#include "DrawDebugHelpers.h"
 
 UTY_BTT_FindRandomLoc::UTY_BTT_FindRandomLoc()
 {
@@ -18,44 +17,32 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::ExecuteTask(UBehaviorTreeComponent& O
 	}
 
 	// Get temp destination
-	auto GetTempDest = [this]()->FVector
+	auto GetTempDest = [this](const FVector& InBaseLoc)->FVector
 	{
 		FVector TempDir = FMath::VRand();
 		//TempDir *= FVector(1.f, 1.f, 0.f);
 		TempDir.Normalize();
 		check(OwnerPawn);
-		return BaseLoc + TempDir * FMath::FRandRange(MinDistance, MaxDistance);
+		return InBaseLoc + TempDir * FMath::FRandRange(MinDistance, MaxDistance);
 	};
 
-	// Check validity
-	auto CheckIfDestValid = [this](const FVector& InVect)->bool
+	auto LoopOutValidDest = [this, GetTempDest](const FVector& InBase, FVector& OutDest)->bool
 	{
-		FVector BoundOri;
-		FVector BoundExt;
-		OwnerPawn->GetActorBounds(true, BoundOri, BoundExt);
+		for (int32 i = 0; i < ValityCheckCount; i++)
+		{
+			if (!IsPathObstacle(InBase)) return true;
+			else OutDest = GetTempDest(InBase);
+		}
 
-		FHitResult HitInfo;
-		static const FName CapsuleTraceSingleName(TEXT("CapsuleTraceSingle"));
-		FCollisionQueryParams Parmas(CapsuleTraceSingleName, false);
-		Parmas.AddIgnoredActor(OwnerPawn);
-		TArray<AActor*> 
-		const bool bHit = GetWorld()->SweepSingleByChannel(HitInfo, BoundOri, InVect
-			, FQuat::Identity, ECollisionChannel::ECC_Visibility
-			, FCollisionShape::MakeCapsule(BoundExt), Parmas);
-		DrawDebugCapsule(GetWorld(), InVect, BoundExt.X, BoundExt.Z
-			, FQuat::Identity, FColor::Red, false, 0.1f);
-		return !bHit;
+		return false;
 	};
 
-	FVector NewDest = GetTempDest();
-	for (int32 i = 0; i < ValityCheckCount; i++)
-	{
-		if (CheckIfDestValid(NewDest)) break;
-		else NewDest = GetTempDest();
-	}
+	FVector NewDest = GetTempDest(BaseLoc);
+	bool bDestValid = false;
+	bDestValid = LoopOutValidDest(BaseLoc, NewDest);
+	if (!bDestValid) bDestValid = LoopOutValidDest(OwnerPawn->GetActorLocation(), NewDest);
 
-	// Update BB data
-	if (CheckIfDestValid(NewDest))
+	if (bDestValid)
 	{
 		BBComp->SetValueAsVector(BlackboardKey.SelectedKeyName, NewDest);
 		return EBTNodeResult::Succeeded;
@@ -71,4 +58,4 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::AbortTask(UBehaviorTreeComponent& Own
 {
 	BaseLoc = FVector::ZeroVector;
 	return EBTNodeResult::Aborted;
-}
+} 

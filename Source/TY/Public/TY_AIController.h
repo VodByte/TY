@@ -32,6 +32,8 @@ public:
 	ATY_AIController();
 	virtual void Tick(float DeltaTime) override;
 
+	void UpdateFlySpeed(float InPercent);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBehaviorTree* BehaviorTree;
@@ -68,6 +70,9 @@ private:
 	
 	TMap<const AActor*, FHatredInfo> HatredMap;
 	float DamageAge = 5.f;
+
+	float DefaultFlySpeed = 0.f;
+	float PartolSpeed = 0.f;
 
 	UFUNCTION()
 	void OnPawnDetected(const TArray<AActor*>& UpdatedActors);

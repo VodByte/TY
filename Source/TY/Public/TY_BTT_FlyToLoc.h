@@ -16,9 +16,17 @@ protected:
 	UPROPERTY(EditAnywhere, meta=(ClampMin = "0.0", UIMin="0.0"))
 	float AcceptableRadius = 5.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0",ClampMax="1.0",UIMin="0.0",UIMax="1.0"))
+	float SpeedPercent = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Gap = 10.f;
+
 private:
 	FVector MoveDir = FVector::ZeroVector;
 	FVector DestLoc = FVector::ZeroVector;
+	FVector RouteLoc = FVector::ZeroVector;
+	class ATY_AIController* TYAICon = nullptr;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		, uint8* NodeMemory);
