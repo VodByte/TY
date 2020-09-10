@@ -63,9 +63,9 @@ void UTY_BTT_FlyToLoc::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 		int32 Count = 360.f / DivideAngle;
 		for (int32 i = 0; i < Count; i++)
 		{
-			FVector SearchLoc = ObstacleLoc + 
-				FRotationMatrix::MakeFromY(OwnerPawn->GetActorLocation()).GetUnitAxes(FVector(EAxis::X)) 
-				* (ObstacleLength + );
+			//FVector SearchLoc = ObstacleLoc + 
+			//	FRotationMatrix::MakeFromY(OwnerPawn->GetActorLocation()).GetUnitAxes(FVector(EAxis::X)) 
+			//	* (ObstacleLength + );
 		}
 	};
 
