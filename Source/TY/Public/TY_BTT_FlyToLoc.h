@@ -20,12 +20,12 @@ protected:
 	float SpeedPercent = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DetectDistance = 5.f;
+	float Gap = 10.f;
 
 private:
-	//FVector MoveDir = FVector::ZeroVector;
+	FVector MoveDir = FVector::ZeroVector;
 	FVector DestLoc = FVector::ZeroVector;
-	//FVector RouteLoc = FVector::ZeroVector;
+	FVector RouteLoc = FVector::ZeroVector;
 	class ATY_AIController* TYAICon = nullptr;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp
