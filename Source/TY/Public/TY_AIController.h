@@ -7,8 +7,17 @@
 
 class UAISenseConfig_Sight;
 class UAISenseConfig_Hearing;
-class UTY_ShootComponent;
+class UAISenseConfig_Damage;
 class ATY_WingMan;
+
+USTRUCT()
+struct FHatredInfo
+{
+	GENERATED_BODY()
+
+	int HitCount = 0;
+	float TimeStamp = 0.f;
+};
 
 UCLASS()
 class TY_API ATY_AIController : public AAIController
@@ -16,7 +25,14 @@ class TY_API ATY_AIController : public AAIController
 	GENERATED_BODY()
 	
 public:
+	static const FName HasFireLineKeyName;
+	static const FName TargetActorKeyName;
+	static const FName LastNoiseLocKeyName;
+
 	ATY_AIController();
+	virtual void Tick(float DeltaTime) override;
+
+	void UpdateFlySpeed(float InPercent);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -33,21 +49,15 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float AIFieldOfView = 75.f;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float AIHearingRange = 7000.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float AIHearingAge = 5.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	AActor* PairPtr = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bIsWingMate = false;
-
 	virtual void BeginPlay() override;
 	//virtual void OnPossess(APawn* InPawn) override;
-	//virtual void Tick(float DeltaTime) override;
 
 private:
 	APawn* PlayerPtr = nullptr;
@@ -55,9 +65,19 @@ private:
 
 	UAISenseConfig_Sight* SightConfig;
 	UAISenseConfig_Hearing* HearingConfig;
-	TArray<AActor*> SeeActors;
-	TArray<AActor*> HearActors;
+	TSet<AActor*> SeeActors;
+	FVector LastNoiseLoc = FVector::ZeroVector;
+	
+	TMap<const AActor*, FHatredInfo> HatredMap;
+	float DamageAge = 5.f;
+
+	float DefaultFlySpeed = 0.f;
+	float PartolSpeed = 0.f;
 
 	UFUNCTION()
 	void OnPawnDetected(const TArray<AActor*>& UpdatedActors);
+
+	UFUNCTION()
+	void HandleOnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType
+		, class AController* InstigatedBy, AActor* DamageCauser);
 };

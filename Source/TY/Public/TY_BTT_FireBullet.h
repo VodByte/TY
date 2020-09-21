@@ -12,7 +12,10 @@ class TY_API UTY_BTT_FireBullet : public UTY_EnemyBBTBase
 	GENERATED_BODY()
 
 public:
-	UTY_BTT_FireBullet();
+	UTY_BTT_FireBullet()
+	{
+		NodeName = FString("FireBullet");
+	}
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

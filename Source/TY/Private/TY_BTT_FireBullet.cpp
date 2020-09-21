@@ -9,23 +9,23 @@ EBTNodeResult::Type UTY_BTT_FireBullet::ExecuteTask(UBehaviorTreeComponent& Owne
 {
 	InitiBBData(OwnerComp);
 
-	UWorld* World = GetWorld();
-	check(World);
-	FTimerManager& TM = World->GetTimerManager();
-	if (TM.IsTimerActive(AutoFireTimer)) return EBTNodeResult::Failed;
+	//UWorld* World = GetWorld();
+	//check(World);
+	//FTimerManager& TM = World->GetTimerManager();
+	//if (TM.IsTimerActive(AutoFireTimer)) return EBTNodeResult::Failed;
 
-	if (!ShootCompPtr)
-	{
-		ShootCompPtr = OwnerPawn->FindComponentByClass<UTY_ShootComponent>();
-		check(ShootCompPtr);
-	}
+	//if (!ShootCompPtr)
+	//{
+	//	ShootCompPtr = OwnerPawn->FindComponentByClass<UTY_ShootComponent>();
+	//	check(ShootCompPtr);
+	//}
 
-	FVector TarLoc = BBComp->GetValueAsVector(FirePointKey.SelectedKeyName);
-	if (!FirePointKey.IsSet()) return EBTNodeResult::Failed;
+	//FVector TarLoc = BBComp->GetValueAsVector(FirePointKey.SelectedKeyName);
+	//if (!FirePointKey.IsSet()) return EBTNodeResult::Failed;
 
-	ShootCompPtr->PressTrigger(TarLoc);
-	TM.SetTimer(AutoFireTimer, this, &UTY_BTT_FireBullet::Ceasefire
-		, AutoFireDuration + FMath::FRandRange(-1.f, 1.f) * AutoFireDurationVarity * AutoFireDuration);
+	//ShootCompPtr->PressTrigger(TarLoc);
+	//TM.SetTimer(AutoFireTimer, this, &UTY_BTT_FireBullet::Ceasefire
+	//	, AutoFireDuration * (1.f + FMath::FRand() * AutoFireDurationVarity));
 	return EBTNodeResult::Succeeded;
 }
 

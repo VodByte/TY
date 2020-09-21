@@ -1,38 +1,66 @@
 #include "TY_BTT_FlyToLoc.h"
 #include "Engine/World.h"
-#include "AIController.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "DrawDebugHelpers.h"
+#include "TY_AIController.h"
 
 UTY_BTT_FlyToLoc::UTY_BTT_FlyToLoc()
 {
 	NodeName = FString("FlyToLoc");
+	bNotifyTick = true;
+	BlackboardKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UTY_BTT_FlyToLoc, BlackboardKey));
+	BlackboardKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UTY_BTT_FlyToLoc, BlackboardKey), AActor::StaticClass());
 }
 
+// Only get data from BB
 EBTNodeResult::Type UTY_BTT_FlyToLoc::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	, uint8* NodeMemory)
 {
 	InitiBBData(OwnerComp);
+	if (!BBComp->IsValidKey(BlackboardKey.GetSelectedKeyID()))
+	{
+		return EBTNodeResult::Failed;
+	}
 
-	FVector OwnerLoc = OwnerPawn->GetActorLocation();
-	FVector DestLoc = BBComp->GetValueAsVector(DestKey.SelectedKeyName);
+	if (!TYAICon)
+	{
+		TYAICon = Cast<ATY_AIController>(OwnerCon);
+		check(TYAICon);
+	}
 
-	//if (InterestLoc != PrevInterestLoc)
-	//{
-	//	PrevInterestLoc == InterestLoc;
-	//	InitiDist = FVector::Dist(OwnerLoc, InterestLoc);
-	//}
+	TYAICon->UpdateFlySpeed(SpeedPercent);
+	DestLoc = FVector::ZeroVector;
+	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
+	{
+		UObject* TempTar = BBComp->GetValueAsObject(BlackboardKey.SelectedKeyName);
+		AActor* Target = Cast<AActor>(TempTar);
+		DestLoc = Target->GetActorLocation();
+	}
+	else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
+	{
+		DestLoc = BBComp->GetValueAsVector(BlackboardKey.SelectedKeyName);
+ 	}
+	return EBTNodeResult::InProgress;
+}
 
-	// Translation
-	FVector DirToDest = (DestLoc - OwnerLoc).GetSafeNormal();
-	OwnerPawn->AddMovementInput(DirToDest);
-	//FVector InputVect = DirToDest + 
-	//	(FVector::Dist(OwnerLoc, InterestLoc) / InitiDist) * (FVector::ZeroVector - DirToDest);
-	//OwnerPawn->AddMovementInput(InputVect, InputValue);
-	//
-	//// Rotation
-	//// If is chasing target, face to target.Otherwise face to vel
-	//FRotator NewRot = FRotationMatrix::MakeFromX(OwnerLoc - (bIsChasing ?
-	//	GetWorld()->GetFirstPlayerController<AAIController>()->GetPawn()->GetActorLocation()
-	//	: InterestLoc)).Rotator();
-	//OwnerPawn->SetActorRotation(NewRot);
-	return EBTNodeResult::Succeeded;
+void UTY_BTT_FlyToLoc::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	DrawDebugSphere(GetWorld(), DestLoc, 55.f, 10, FColor::Red, false);
+	FVector MoveDir = (DestLoc - OwnerPawn->GetActorLocation()).GetSafeNormal();
+	// Detect obstacle
+	auto OwnerLoc = OwnerPawn->GetActorLocation();
+	FHitResult HitInfo;
+	const bool bHasObstacle = IsPathObstacle(OwnerLoc + MoveDir * DetectDistance
+		, &HitInfo);
+	if (bHasObstacle) MoveDir = (MoveDir - (HitInfo.Location - OwnerLoc)).GetSafeNormal();
+
+	// Move pawn
+	OwnerPawn->AddMovementInput(MoveDir);
+
+	if (FVector::Dist(OwnerPawn->GetActorLocation(), DestLoc) <= AcceptableRadius)
+	{
+		TYAICon->UpdateFlySpeed(1.f);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }

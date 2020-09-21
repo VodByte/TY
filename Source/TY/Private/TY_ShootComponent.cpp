@@ -310,7 +310,9 @@ void UTY_ShootComponent::SpawnBullet()
 		AActor* BulletActor = BulletPool->RequestPoolObject(FTransform(BulletRot, GetMuzzleLoc()), GetOwner());
 		check(BulletActor);
 		auto Bullet = Cast<ATY_Bullet>(BulletActor);
-		Bullet->InitiBullet(*OwnerGunData/*, CalcBulletInheritVel()*/);
+		auto OwnerPawn = Cast<APawn>(GetOwner());
+		check(OwnerPawn);
+		Bullet->InitiBullet(*OwnerGunData, OwnerPawn);
 
 		UGameplayStatics::SpawnEmitterAttached(OwnerGunData->MuzzleParticle, const_cast<USceneComponent*>(MuzzleComp), NAME_None
 			, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);

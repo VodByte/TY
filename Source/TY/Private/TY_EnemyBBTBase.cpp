@@ -2,19 +2,8 @@
 #include "TY_EnemyBBTBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-
-UBlackboardComponent* UTY_EnemyBBTBase::BBComp = nullptr;
-AAIController* UTY_EnemyBBTBase::OwnerCon = nullptr;
-APawn* UTY_EnemyBBTBase::OwnerPawn= nullptr;
-//const FName UTY_EnemyBBTBase::IsChasingKeyName = FName(TEXT("IsChasing"));
-//const FName UTY_EnemyBBTBase::InterestLocKeyName = FName(TEXT("InterestLoc"));
-//const FName UTY_EnemyBBTBase::CanSeeHostileKeyName = FName(TEXT("CanSeeHostile"));
-//const FName UTY_EnemyBBTBase::CanOnlyHearHostileKeyName = FName(TEXT("CanOnlyHearHostile"));
-//
-//bool UTY_EnemyBBTBase::bIsChasing = false;
-//FVector UTY_EnemyBBTBase::InterestLoc = FVector::ZeroVector;
-//bool UTY_EnemyBBTBase::bCanSeeHostile = false;
-//bool UTY_EnemyBBTBase::bCanOnlyHearHostile = false;
+#include "BehaviorTree/BehaviorTree.h"
+#include "DrawDebugHelpers.h"
 
 void UTY_EnemyBBTBase::InitiBBData(UBehaviorTreeComponent& OwnerComp)
 {
@@ -24,9 +13,37 @@ void UTY_EnemyBBTBase::InitiBBData(UBehaviorTreeComponent& OwnerComp)
 		OwnerPawn = OwnerCon->GetPawn();
 		BBComp = OwnerCon->GetBlackboardComponent();
 	}
+}
 
-	//bIsChasing = BBComp->GetValueAsBool(IsChasingKeyName);
-	//InterestLoc = BBComp->GetValueAsVector(InterestLocKeyName);
-	//bCanSeeHostile = BBComp->GetValueAsBool(CanSeeHostileKeyName);
-	//bCanOnlyHearHostile = BBComp->GetValueAsBool(CanOnlyHearHostileKeyName);
+/// <summary>
+/// Is there any obstacle in the path to dset?
+/// </summary>
+bool UTY_EnemyBBTBase::IsPathObstacle(const FVector& InDest, FHitResult* OutHitInfo) const
+{
+	FVector BoundOri;
+	FVector BoundExt;
+	OwnerPawn->GetActorBounds(true, BoundOri, BoundExt);
+
+	static const FName CapsuleTraceSingleName(TEXT("CapsuleTraceSingle"));
+	FCollisionQueryParams Parmas(CapsuleTraceSingleName, false);
+	Parmas.AddIgnoredActor(OwnerPawn);
+	// HACK: If don't reduce bound extent, when char stand on ground, ground will be
+	// detected as obstracle.
+	FHitResult HitInfo;
+	const bool bHit = GetWorld()->SweepSingleByChannel(OutHitInfo ? *OutHitInfo : HitInfo, BoundOri, InDest
+		, FQuat::Identity, ECollisionChannel::ECC_Visibility
+		, FCollisionShape::MakeCapsule(BoundExt * 0.8f), Parmas);
+
+	return bHit;
+}
+
+bool UTY_EnemyBBTBase::IsDestObstacle(const FVector& InDest) const
+{
+	FVector BoundOri;
+	FVector BoundExt;
+	OwnerPawn->GetActorBounds(true, BoundOri, BoundExt);
+
+	const bool bOverlap = GetWorld()->OverlapAnyTestByChannel(InDest, FQuat::Identity
+		, ECollisionChannel::ECC_Visibility, FCollisionShape::MakeCapsule(BoundExt));
+	return bOverlap;
 }

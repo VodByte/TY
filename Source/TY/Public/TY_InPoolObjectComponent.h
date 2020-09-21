@@ -4,8 +4,6 @@
 #include "Components/ActorComponent.h"
 #include "TY_InPoolObjectComponent.generated.h"
 
-
-
 UCLASS( ClassGroup=(TY), meta=(BlueprintSpawnableComponent) )
 class TY_API UTY_InPoolObjectComponent : public UActorComponent
 {

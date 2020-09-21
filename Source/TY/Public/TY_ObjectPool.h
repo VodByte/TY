@@ -23,6 +23,8 @@ public:
 
 	static TMap<FString, ATY_ObjectPool*> Pools;
 
+	FORCEINLINE const AActor* GetOwner() const { return Owner; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -51,6 +53,7 @@ private:
 
 	int PoolRemain = 0;
 	TQueue<AActor*, EQueueMode::Mpsc> Pool;
+	const AActor* Owner;
 
 	void InitPool();
 	UTY_InPoolObjectComponent* GetPoolHelperComp(AActor* InActor) const;

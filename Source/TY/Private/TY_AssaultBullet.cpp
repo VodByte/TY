@@ -58,8 +58,9 @@ void ATY_AssaultBullet::Tick(float DeltaTime)
 	AddActorWorldOffset(CurrentBulletVelocity);
 }
 
-void ATY_AssaultBullet::InitiBullet(const FTY_GunData& InGunData/*, FVector InInheritVel*/)
+void ATY_AssaultBullet::InitiBullet(const FTY_GunData& InGunData, APawn* InBulletOwner)
 {
+	SetInstigator(InBulletOwner);
 	TargetTags = InGunData.TargetTags;
 	InitiBulletVelocity = InGunData.BulletSpeed * GetActorForwardVector()/* + InInheritVel*/;
 	Gravity = InGunData.BulletGravity;
@@ -80,6 +81,7 @@ void ATY_AssaultBullet::HandleOnComponentBeginOverlap(UPrimitiveComponent* Overl
 	}
 	if (!bIsMatched) return;
 
-	UGameplayStatics::ApplyPointDamage(OtherActor, BaseDamage, GetActorLocation(), SweepResult, nullptr, nullptr, DamageType);
+	UGameplayStatics::ApplyPointDamage(OtherActor, BaseDamage, GetActorLocation()
+		, SweepResult, GetInstigatorController(), GetInstigator(), DamageType);
 	PoolHelper->ReturnToPool();
 }
