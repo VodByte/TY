@@ -18,6 +18,6 @@ protected:
 	APawn* OwnerPawn = nullptr;
 
 	void InitiBBData(UBehaviorTreeComponent& OwnerComp);
-	bool IsPathObstacle(const FVector& InDest, bool bLogInfo = false) const;
+	bool IsPathObstacle(const FVector& InDest, FHitResult* OutHitInfo = nullptr) const;
 	bool IsDestObstacle(const FVector& InDest) const;
 };

@@ -17,7 +17,6 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::ExecuteTask(UBehaviorTreeComponent& O
 	}
 
 	// Get temp destination
-<<<<<<< HEAD
 	auto GetTempDest = [this]()->FVector
 	{
 		FVector RandVect = FMath::VRand().GetSafeNormal() * FMath::FRandRange(MinDistance, MaxDistance);
@@ -40,32 +39,6 @@ EBTNodeResult::Type UTY_BTT_FindRandomLoc::ExecuteTask(UBehaviorTreeComponent& O
 			break;
 		}
 	}
-=======
-	auto GetTempDest = [this](const FVector& InBaseLoc)->FVector
-	{
-		FVector TempDir = FMath::VRand();
-		//TempDir *= FVector(1.f, 1.f, 0.f);
-		TempDir.Normalize();
-		check(OwnerPawn);
-		return InBaseLoc + TempDir * FMath::FRandRange(MinDistance, MaxDistance);
-	};
-
-	auto LoopOutValidDest = [this, GetTempDest](const FVector& InBase, FVector& OutDest)->bool
-	{
-		for (int32 i = 0; i < ValityCheckCount; i++)
-		{
-			if (!IsPathObstacle(InBase)) return true;
-			else OutDest = GetTempDest(InBase);
-		}
-
-		return false;
-	};
-
-	FVector NewDest = GetTempDest(BaseLoc);
-	bool bDestValid = false;
-	bDestValid = LoopOutValidDest(BaseLoc, NewDest);
-	if (!bDestValid) bDestValid = LoopOutValidDest(OwnerPawn->GetActorLocation(), NewDest);
->>>>>>> 4475b7bef786ae20f8d00cbbbb25cede18b1cc7b
 
 	if (bDestValid)
 	{

@@ -11,15 +11,12 @@ class TY_API UTY_BTT_FindRandomLoc : public UTY_EnemyBBTBase
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-<<<<<<< HEAD
 	float GroundHeight = 880.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float OffGroundDist = 200.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-=======
->>>>>>> 4475b7bef786ae20f8d00cbbbb25cede18b1cc7b
 	float MaxDistance = 800.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
